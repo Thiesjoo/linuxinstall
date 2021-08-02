@@ -86,7 +86,7 @@ function debug () {
 
 #### MY SCRIPTS STARTS HERE
 
-echo "debug: $d, zsh: $zsh "
+echo "Debug mode: $d, Installing zsh: $zsh . Installing python: $pyth . Installing GUI apps: $gui (Personal: $extragui ). Generating ssh keys with email: $ssh "
 
 debug && echo "Running in debug mode"
 
