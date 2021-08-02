@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+# THIS FILE IS FROM:
+# https://github.com/deluan/zsh-in-docker
+
 THEME=powerlevel10k/powerlevel10k
 PLUGINS=""
 ZSHRC_APPEND=""
