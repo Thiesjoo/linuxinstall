@@ -40,7 +40,7 @@ fi
 # read getopt’s output this way to handle the quoting right:
 eval set -- "$PARSED"
 
-d=y zsh=y pyth=y 
+d=y zsh=y pyth=n
 ssh=- gui=n guiextra=n
 # now enjoy the options in order and nicely split until we see --
 while true; do
@@ -54,7 +54,7 @@ while true; do
             shift
             ;;
         -p|--python)
-            pyth=n
+            pyth=y
             shift
             ;;
         -g|--gui)
@@ -62,7 +62,7 @@ while true; do
             shift
             ;;
         -P|--personal)
-            extragui=y
+            guiextra=y
             shift
             ;;
         -s|--ssh)
@@ -86,11 +86,12 @@ function debug () {
 
 #### MY SCRIPTS STARTS HERE
 
-echo "Debug mode: $d, Installing zsh: $zsh . Installing python: $pyth . Installing GUI apps: $gui (Personal: $extragui ). Generating ssh keys with email: $ssh "
+echo "Debug mode: $d, Installing zsh: $zsh . Installing python: $pyth . Installing GUI apps: $gui (Personal: $guiextra ). Generating ssh keys with email: $ssh "
 
 debug && echo "Running in debug mode"
-
 debug && echo "Updating & upgrading all packages"
+
+echo "THIS WILLL DELETE THE OLD ZSH INSTALLATION! It's recommened to make an LVM snapshot/VM snapshot first (:"
 
 sudo -u root bash << EOF
 apt update -y -q
@@ -114,6 +115,9 @@ fi
 if [ $zsh = y ];
 then
     echo "Going to install ZSH next"
+    rm -rf $HOME/.zshrc
+    rm -rf $HOME/.oh-my-zsh
+
     args="-t bureau \
     -p https://github.com/zsh-users/zsh-autosuggestions \
     -p https://github.com/lukechilds/zsh-nvm \
@@ -123,7 +127,7 @@ then
     then
         debug && echo "Installing pyenv"
         args+=" -p https://github.com/mattberther/zsh-pyenv"
-        sudo apt-get install make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+        sudo apt install -y -q make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
     fi
 
     if [ $ssh != - ];
@@ -138,25 +142,21 @@ then
 
     sudo chsh -s "$(command -v zsh)" "${USER}"
     debug && echo "Finished ZSH installation"
-
-    zsh
-
-    if [ $pyth = y ];
-    then
-        debug && echo "Going to install latest python version"
-        pyenv install 3.9.6
-        pyenv global 3.9.6
-    fi
-    nvm install 14 --lts
 fi
 
 
 # Install GUI apps
 if [ $gui = y ];
 then
+    if ! command -v google-chrome &> /dev/null
+then
     wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
-    echo "Added vscode repo's"
+    sudo add-apt-repository -y "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+    debug && echo "Added vscode repo's"
+        #Vscode
+    sudo apt install code
+    echo "Installed vscode"
+    fi
         # Chrome
     if ! command -v google-chrome &> /dev/null
     then
@@ -173,9 +173,7 @@ then
         echo "For further chrome tweaking: go to chrome://flags and disable hardware-media-key-handling. For 4k display set page zoom in chrome://settings to 150%"    fi
     fi
 
-    #Vscode
-    sudo apt install code
-    echo "Sudo installed vscode"
+
 
     if [ $guiextra = y ];
     then    
@@ -206,3 +204,17 @@ then
         echo "Started discord, and autostarted it"
     fi
 fi
+
+
+# TODO: AUto github key upload? (You can just copy your old key)
+# Auto apply gnome config https://linuxconfig.org/how-to-install-gnome-shell-extensions-from-zip-file-using-command-line-on-ubuntu-18-04-bionic-beaver-linux
+# Maybe spicetify
+
+echo "This script is done and will now boot your new ZSH config"
+echo "To install python & node please run: "
+echo "
+    pyenv install 3.9.6
+    pyenv global 3.9.6
+    nvm install 14 --lts"
+
+zsh
