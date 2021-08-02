@@ -124,8 +124,10 @@ cd /tmp
 
 # Install On-My-Zsh
 if [ ! -d $HOME/.oh-my-zsh ]; then
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  #TODO: Maybe don't forcefully remove ohmyzsh
+  rm $HOME/.oh-my-zsh -rf
 fi
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 # Generate plugin list
 plugin_list=""

@@ -100,17 +100,17 @@ EOF
 if [ $zsh = y ];
 then
 echo "Going to install ZSH next"
-args="-t bureau -p zsh-autosuggestions -p zsh-nvm -p git"
+args="-t bureau -p https://github.com/zsh-users/zsh-autosuggestions.git -p https://github.com/lukechilds/zsh-nvm.git -p git"
 
 if [ $pyth = y ];
 then
-args+=" -p zsh-pyenv"
+args+=" -p https://github.com/mattberther/zsh-pyenv.git"
 debug && echo "Installing pyenv"
 # curl https://pyenv.run | bash
 fi
-    sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)" -- $args
-#git clone https://github.com/mattberther/zsh-pyenv ~/.oh-my-zsh/custom/plugins/zsh-pyenv
-
+    sh -c "$(wget -O- https://raw.githubusercontent.com/Thiesjoo/linuxinstall/main/assets/ohymyzsh.sh)" -- $args
+    sudo chsh -s "$(command -v zsh)" "${USER}"
+    debug && echo "Finished ZSH installation"
 fi
 
 
