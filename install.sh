@@ -40,7 +40,7 @@ fi
 # read getopt’s output this way to handle the quoting right:
 eval set -- "$PARSED"
 
-d=y zsh=n pyth=n 
+d=y zsh=y pyth=y 
 ssh=- gui=n guiextra=n
 # now enjoy the options in order and nicely split until we see --
 while true; do
@@ -189,7 +189,7 @@ then
         
 
         # Autostart apps
-        wget -qO /tmp/autostart.py https://gist.githubusercontent.com/Thiesjoo/5aa31380576de140c83ca1a0849a2d2d/raw/autostart.py
+        wget -qO /tmp/autostart.py https://raw.githubusercontent.com/Thiesjoo/linuxinstall/main/assets/autostart.py
         echo "Cloned autostart script"
 
         whatsdesk &>/dev/null &
