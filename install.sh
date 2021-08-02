@@ -15,8 +15,8 @@ if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
     exit 1
 fi
 
-OPTIONS=dzo:p
-LONGOPTS=debug,nozsh,output:,nopython
+OPTIONS=dzs:pgP
+LONGOPTS=debug,nozsh,ssh:,nopython,gui,personal
 
 # -regarding ! and PIPESTATUS see above
 # -temporarily store output to be able to check for errors
@@ -28,16 +28,20 @@ if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
     #  then getopt has complained about wrong arguments to stdout
     echo "Usage: $0"
     echo "With ALL optional arguments: "
-    echo "  -d, --debug       enable debug options (echo warnings)"
-    echo "  -z, --nozsh       do no install zsh"
-    echo "  -p, --nopython       do no install pyenv"
+    echo "  -d, --debug                  Enable debug options (echo warnings)"
+    echo "  -z, --nozsh                  Do no install zsh"
+    echo "  -p, --python                 Install pyenv"
+    echo "  -s, --ssh [email]            Generate a github ssh key with provided email (Program WILL ask for a ssh password)"
+    echo "  -g, --gui                    Install gui apps (Vscode, Google Chrome)"
+    echo "  -P, --personal               Install gui apps (Spotify, Discord, Whatsapp)"
 
     exit 2
 fi
 # read getopt’s output this way to handle the quoting right:
 eval set -- "$PARSED"
 
-d=y zsh=y pyth=y
+d=y zsh=n pyth=n 
+ssh=- gui=n guiextra=n
 # now enjoy the options in order and nicely split until we see --
 while true; do
     case "$1" in
@@ -49,12 +53,20 @@ while true; do
             zsh=n
             shift
             ;;
-        -p|--nopython)
+        -p|--python)
             pyth=n
             shift
             ;;
-        -o|--output)
-            outFile="$2"
+        -g|--gui)
+            gui=y
+            shift
+            ;;
+        -P|--personal)
+            extragui=y
+            shift
+            ;;
+        -s|--ssh)
+            ssh="$2"
             shift 2
             ;;
         --)
@@ -68,16 +80,9 @@ while true; do
     esac
 done
 
-# # handle non-option arguments
-# if [[ $# -ne 1 ]]; then
-#     echo "$0: A single input file is required."
-#     exit 4
-# fi
-
 function debug () {
     [[ $d = y ]] && return 0 || return 1
 }
-
 
 #### MY SCRIPTS STARTS HERE
 
@@ -96,25 +101,108 @@ apt install zsh git net-tools curl software-properties-common apt-transport-http
 echo "Installed deps for all scripts and software"
 EOF
 
+# Install keychain https://www.cyberciti.biz/faq/ubuntu-debian-linux-server-install-keychain-apt-get-command/
+if [ $ssh != - ];
+then
+    echo "Generating SSH key"
+    sudo apt-get install keychain
+    ssh-keygen -t ed25519 -f $HOME/.ssh/id_github -C $ssh
+# Perhaps generate SSH & GPG keys
+fi
+
 
 if [ $zsh = y ];
 then
-echo "Going to install ZSH next"
-args="-t bureau -p https://github.com/zsh-users/zsh-autosuggestions.git -p https://github.com/lukechilds/zsh-nvm.git -p git"
+    echo "Going to install ZSH next"
+    args="-t bureau \
+    -p https://github.com/zsh-users/zsh-autosuggestions \
+    -p https://github.com/lukechilds/zsh-nvm \
+    -p git "
 
-if [ $pyth = y ];
-then
-args+=" -p https://github.com/mattberther/zsh-pyenv.git"
-debug && echo "Installing pyenv"
-# curl https://pyenv.run | bash
-fi
-    sh -c "$(wget -O- https://raw.githubusercontent.com/Thiesjoo/linuxinstall/main/assets/ohymyzsh.sh)" -- $args
+    if [ $pyth = y ];
+    then
+        debug && echo "Installing pyenv"
+        args+=" -p https://github.com/mattberther/zsh-pyenv"
+        sudo apt-get install make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+    fi
+
+    if [ $ssh != - ];
+    then
+        args+='/usr/bin/keychain --clear $HOME/.ssh/id_github \n source $HOME/.keychain/$HOSTNAME-sh'
+    fi
+
+    sh -c "$(wget -O- https://raw.githubusercontent.com/Thiesjoo/linuxinstall/main/assets/ohymyzsh.sh)" -- $args \
+        -a 'alias codeAll="ls ./*/ -d | xargs -I{} code {}"' \
+        -a 'alias pullAll="ls ./*/ -d | xargs -I{} git -C {} pull"' \
+        -a 'alias mainAll="ls ./*/ -d | xargs -I{} git -C {} checkout main"'
+
     sudo chsh -s "$(command -v zsh)" "${USER}"
     debug && echo "Finished ZSH installation"
+
+    zsh
+
+    if [ $pyth = y ];
+    then
+        debug && echo "Going to install latest python version"
+        pyenv install 3.9.6
+        pyenv global 3.9.6
+    fi
+    nvm install 14 --lts
 fi
 
 
+# Install GUI apps
+if [ $gui = y ];
+then
+    wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+    echo "Added vscode repo's"
+        # Chrome
+    if ! command -v google-chrome &> /dev/null
+    then
+        cd /tmp
+        echo "google-chrome could not be found"
+        wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt install ./google-chrome-stable_current_amd64.deb -q
+        rm google-chrome-stable_current_amd64.deb 
+        echo "Installed chrome"
+
+        cp /usr/share/applications/google-chrome.desktop ~/.install-backup
+        sudo sed -i 's/google-chrome-stable/google-chrome-stable --ignore-gpu-blacklist --enable-parallel-downloading /g' /usr/share/applications/google-chrome.desktop
+        
+        echo "For further chrome tweaking: go to chrome://flags and disable hardware-media-key-handling. For 4k display set page zoom in chrome://settings to 150%"    fi
+    fi
+
+    #Vscode
+    sudo apt install code
+    echo "Sudo installed vscode"
+
+    if [ $guiextra = y ];
+    then    
+        debug && echo "Installing extra gui applications"
+
+        # Command applications
+        snap install whatsdesk
+        snap install spotify
+        snap install discord
+        echo "Installed spotify, whatsapp and discord"
+        
+
+        # Autostart apps
+        wget -qO /tmp/autostart.py https://gist.githubusercontent.com/Thiesjoo/5aa31380576de140c83ca1a0849a2d2d/raw/autostart.py
+        echo "Cloned autostart script"
+
+        whatsdesk &>/dev/null &
+        python3 /tmp/autostart.py Whatsapp whatsdesk
+        echo "Started whatsapp, and autostarted it"
+
+        spotify &>/dev/null &
+        python3 /tmp/autostart.py Spotify spotify
+        echo "Started spotify, and autostarted it"
 
 
-# TO ADD TO .zshrc
-#
+        discord &>/dev/null &
+        python3 /tmp/autostart.py Discord discord
+        echo "Started discord, and autostarted it"
+    fi
+fi
