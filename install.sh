@@ -16,7 +16,7 @@ if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
 fi
 
 OPTIONS=dzs:pgP
-LONGOPTS=debug,nozsh,ssh:,nopython,gui,personal
+LONGOPTS=debug,nozsh,ssh:,python,gui,personal
 
 # -regarding ! and PIPESTATUS see above
 # -temporarily store output to be able to check for errors
