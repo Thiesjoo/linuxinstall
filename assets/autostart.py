@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+
+# THIS FILE IS FROM:
+# https://askubuntu.com/a/598202
+
 import os
 import sys
 home = os.environ["HOME"]
