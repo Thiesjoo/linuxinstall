@@ -178,7 +178,7 @@ then
     wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
     sudo add-apt-repository -y "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
     debug && echo "Added vscode repo's"
-    sudo apt install code
+    sudo apt install code -y
     echo "Installed vscode"
     # Chrome
     if ! command -v google-chrome &> /dev/null
@@ -186,7 +186,7 @@ then
         cd /tmp
         echo "google-chrome could not be found"
         wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo apt install ./google-chrome-stable_current_amd64.deb -q
+        sudo apt install ./google-chrome-stable_current_amd64.deb -qy
         rm google-chrome-stable_current_amd64.deb 
         echo "Installed chrome"
 
