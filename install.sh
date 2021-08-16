@@ -15,7 +15,7 @@ if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
     exit 1
 fi
 
-OPTIONS=dzs:pgPDg:
+OPTIONS=dzs:pgPDG:
 LONGOPTS=debug,nozsh,ssh:,python,gui,personal,docker,gpg:
 
 # -regarding ! and PIPESTATUS see above
@@ -68,7 +68,7 @@ while true; do
             guiextra=y
             shift
             ;;
-        -g|--gpg)
+        -G|--gpg)
             gpg="$2"
             shift 2
             ;;
