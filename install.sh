@@ -149,13 +149,13 @@ then
         -a 'ZSH_COMMAND_TIME_MSG="Execution time: %s"' \
         -a 'ZSH_COMMAND_TIME_COLOR="cyan"' \
         -a 'ZSH_COMMAND_TIME_EXCLUDE=(nano)' \
-        -a "TIMEFMT='%J   %U  user %S system %P cpu %*E total'$'\n'\
-'avg shared (code):         %X KB'$'\n'\
-'avg unshared (data/stack): %D KB'$'\n'\
-'total (sum):               %K KB'$'\n'\
-'max memory:                %M '$MAX_MEMORY_UNITS''$'\n'\
-'page faults from disk:     %F'$'\n'\
-'other page faults:         %R'"
+        -a "TIMEFMT='%J   %U  user %S system %P cpu %*E total'$'\n'\ " \
+        -a "'avg shared (code):         %X KB'$'\n'\ " \
+        -a "'avg unshared (data/stack): %D KB'$'\n'\ " \
+        -a "'total (sum):               %K KB'$'\n'\ " \
+        -a "'max memory:                %M '$MAX_MEMORY_UNITS''$'\n'\ " \
+        -a "'page faults from disk:     %F'$'\n'\ " \
+        -a "'other page faults:         %R'"
 
     sudo chsh -s "$(command -v zsh)" "${USER}"
     debug && echo "Finished ZSH installation"
