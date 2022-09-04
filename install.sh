@@ -143,19 +143,13 @@ then
     sh -c "$(wget -O- https://raw.githubusercontent.com/Thiesjoo/linuxinstall/main/assets/ohymyzsh.sh)" -- $args \
         -a 'alias codeAll="ls ./*/ -d | xargs -I{} code {}"' \
         -a 'alias pullAll="ls ./*/ -d | xargs -I{} git -C {} pull"' \
-        -a 'alias mainAll="ls ./*/ -d | xargs -I{} git -C {} checkout main"'
+        -a 'alias mainAll="ls ./*/ -d | xargs -I{} git -C {} checkout main"' \
         -a '/usr/bin/keychain --clear $HOME/.ssh/id_ed25519' \
         -a 'source $HOME/.keychain/$HOSTNAME-sh' \
         -a 'ZSH_COMMAND_TIME_MSG="Execution time: %s"' \
         -a 'ZSH_COMMAND_TIME_COLOR="cyan"' \
         -a 'ZSH_COMMAND_TIME_EXCLUDE=(nano)' \
-        -a "TIMEFMT='%J   %U  user %S system %P cpu %*E total'$'\n'\ " \
-        -a "'avg shared (code):         %X KB'$'\n'\ " \
-        -a "'avg unshared (data/stack): %D KB'$'\n'\ " \
-        -a "'total (sum):               %K KB'$'\n'\ " \
-        -a "'max memory:                %M '$MAX_MEMORY_UNITS''$'\n'\ " \
-        -a "'page faults from disk:     %F'$'\n'\ " \
-        -a "'other page faults:         %R'"
+
 
     sudo chsh -s "$(command -v zsh)" "${USER}"
     debug && echo "Finished ZSH installation"
@@ -241,6 +235,8 @@ fi
 echo "This script is done and will now boot your new ZSH config"
 echo "To install node please run: "
 echo "nvm install 18 --lts \n\n"
+
+echo "https://superuser.com/questions/480928/is-there-any-command-like-time-but-for-memory-usage for memory usage with time\n"
 
 echo "To restore gnome config: dconf load / < saved_settings.dconf"
 echo "(Also copy extensions folders ~/.local/share/gnome-shell/extensions) \n\n"
