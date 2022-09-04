@@ -150,6 +150,7 @@ then
         -a 'ZSH_COMMAND_TIME_COLOR="cyan"' \
         -a 'ZSH_COMMAND_TIME_EXCLUDE=(nano)' \
 
+    git clone https://github.com/popstas/zsh-command-time.git ~/.oh-my-zsh/custom/plugins/command-time
 
     sudo chsh -s "$(command -v zsh)" "${USER}"
     debug && echo "Finished ZSH installation"
