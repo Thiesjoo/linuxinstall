@@ -109,18 +109,9 @@ apt update -y -q
 apt upgrade -y -q
 echo "Apt updated and upgraded"
 
-apt install zsh git net-tools curl software-properties-common apt-transport-https -y -q
+apt install zsh git net-tools curl software-properties-common apt-transport-https keychain -y -q
 echo "Installed deps for all scripts and software"
 EOF
-
-if [ $ssh != - ];
-then
-    echo "Generating SSH key"
-    sudo apt-get install keychain
-    ssh-add $ssh
-fi
-
-
 
 if [ $gpg != - ];
 then
@@ -135,7 +126,6 @@ then
 
  if [ -r ~/.bash_profile ]; then echo 'export GPG_TTY=$(tty)' >> ~/.bash_profile; \
   else echo 'export GPG_TTY=$(tty)' >> ~/.profile; fi
-
 fi  
 
 if [ $zsh = y ];
@@ -147,24 +137,25 @@ then
     args="-t bureau \
     -p https://github.com/zsh-users/zsh-autosuggestions \
     -p https://github.com/lukechilds/zsh-nvm \
+    -p https://github.com/popstas/zsh-command-time \
     -p git "
-
-    if [ $pyth = y ];
-    then
-        debug && echo "Installing pyenv"
-        args+=" -p https://github.com/mattberther/zsh-pyenv"
-        sudo apt install -y -q make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-    fi
-
-    if [ $ssh != - ];
-    then
-        args+='/usr/bin/keychain --clear $HOME/.ssh/'+$ssh+' \n source $HOME/.keychain/$HOSTNAME-sh'
-    fi
 
     sh -c "$(wget -O- https://raw.githubusercontent.com/Thiesjoo/linuxinstall/main/assets/ohymyzsh.sh)" -- $args \
         -a 'alias codeAll="ls ./*/ -d | xargs -I{} code {}"' \
         -a 'alias pullAll="ls ./*/ -d | xargs -I{} git -C {} pull"' \
         -a 'alias mainAll="ls ./*/ -d | xargs -I{} git -C {} checkout main"'
+        -a '/usr/bin/keychain --clear $HOME/.ssh/id_ed25519' \
+        -a 'source $HOME/.keychain/$HOSTNAME-sh' \
+        -a 'ZSH_COMMAND_TIME_MSG="Execution time: %s"' \
+        -a 'ZSH_COMMAND_TIME_COLOR="cyan"' \
+        -a 'ZSH_COMMAND_TIME_EXCLUDE=(nano)' \
+        -a "TIMEFMT='%J   %U  user %S system %P cpu %*E total'$'\n'\
+'avg shared (code):         %X KB'$'\n'\
+'avg unshared (data/stack): %D KB'$'\n'\
+'total (sum):               %K KB'$'\n'\
+'max memory:                %M '$MAX_MEMORY_UNITS''$'\n'\
+'page faults from disk:     %F'$'\n'\
+'other page faults:         %R'"
 
     sudo chsh -s "$(command -v zsh)" "${USER}"
     debug && echo "Finished ZSH installation"
@@ -248,11 +239,8 @@ fi
 # Maybe spicetify
 
 echo "This script is done and will now boot your new ZSH config"
-echo "To install python & node please run: "
-echo "
-    pyenv install 3.9.6
-    pyenv global 3.9.6
-    nvm install 14 --lts \n\n"
+echo "To install node please run: "
+echo "nvm install 18 --lts \n\n"
 
 echo "To restore gnome config: dconf load / < saved_settings.dconf"
 echo "(Also copy extensions folders ~/.local/share/gnome-shell/extensions) \n\n"
