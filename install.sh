@@ -109,7 +109,7 @@ apt update -y -q
 apt upgrade -y -q
 echo "Apt updated and upgraded"
 
-apt install zsh git net-tools curl software-properties-common apt-transport-https keychain -y -q
+apt install zsh git net-tools curl software-properties-common apt-transport-https keychain nala -y -q
 echo "Installed deps for all scripts and software"
 EOF
 
