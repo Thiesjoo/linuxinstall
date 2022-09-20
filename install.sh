@@ -138,7 +138,7 @@ then
     -p https://github.com/zsh-users/zsh-autosuggestions \
     -p https://github.com/lukechilds/zsh-nvm \
     -p https://github.com/popstas/zsh-command-time \
-    -p git "
+    -p git -p zsh-syntax-highlighting"
 
     sh -c "$(wget -O- https://raw.githubusercontent.com/Thiesjoo/linuxinstall/main/assets/ohymyzsh.sh)" -- $args \
         -a 'alias codeAll="ls ./*/ -d | xargs -I{} code {}"' \
@@ -151,6 +151,7 @@ then
         -a 'ZSH_COMMAND_TIME_EXCLUDE=(nano)' \
 
     git clone https://github.com/popstas/zsh-command-time.git ~/.oh-my-zsh/custom/plugins/command-time
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
     sudo chsh -s "$(command -v zsh)" "${USER}"
     debug && echo "Finished ZSH installation"
